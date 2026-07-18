@@ -1,23 +1,57 @@
-name: Make Public Repos Private
+name: Repository Visibility Manager
 
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: "Select the operation"
+        required: true
+        type: choice
+        options:
+          - public-to-private
+          - private-to-public
 
 jobs:
-  make-private:
+  update-visibility:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Make all public repos private
+      - name: Install GitHub CLI
+        run: |
+          type -p gh || (
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg |
+            sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg &&
+            sudo chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg &&
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" |
+            sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null &&
+            sudo apt update &&
+            sudo apt install gh -y
+          )
+
+      - name: Update repository visibility
         env:
           GH_TOKEN: ${{ secrets.PAT }}
+          OWNER: ${{ github.repository_owner }}
+          ACTION: ${{ github.event.inputs.action }}
         run: |
-          gh repo list ${{ github.repository_owner }} \
-            --visibility public \
-            --limit 200 \
+          if [ "$ACTION" = "public-to-private" ]; then
+            FROM="public"
+            TO="private"
+          else
+            FROM="private"
+            TO="public"
+          fi
+
+          echo "Changing all $FROM repositories to $TO..."
+
+          gh repo list "$OWNER" \
+            --visibility "$FROM" \
+            --limit 1000 \
             --json nameWithOwner \
             --jq '.[].nameWithOwner' |
           while read repo; do
-            echo "Making $repo private..."
-            gh repo edit "$repo" --visibility private
+            echo "Updating $repo..."
+            gh repo edit "$repo" --visibility "$TO"
           done
+
+          echo "Done."
