@@ -1,8 +1,11 @@
 # Repository Visibility Manager
 
-A GitHub Actions workflow that bulk-changes the visibility of **every repository** in your account — public → private, or private → public — with a single click. No local scripts, no manual clicking through dozens of repo settings pages.
+A GitHub Actions workflow that bulk-changes the visibility of all repositories in your account: 
+- Public → Private
+- Private → Public
+with just a single click. No local scripts, no manual clicking through dozens of repo settings pages.
 
-I built this after ending up with 80+ public repos where only a handful were actually meant to be seen. Flipping each one by hand wasn't worth the afternoon, so this does it in one run.
+I built this after ending up with 80+ public repos where only a few of them were actually meant to be seen. Flipping each one by hand wasn't worth, so I automated it.
 
 > 📖 I wrote a full walkthrough of how this works and why: [Read the article on Medium](#) *(add your link here)*
 
@@ -22,7 +25,7 @@ You trigger the workflow (pick a direction from a dropdown)
 GitHub Actions spins up a runner and installs GitHub CLI
         │
         ▼
-GitHub CLI authenticates using a PAT stored in Secrets
+GitHub CLI authenticates using a Personal Access Token (PAT) stored in Secrets
         │
         ▼
 gh repo list  →  fetches all repos matching the source visibility
@@ -33,13 +36,14 @@ gh repo edit  →  updates each one to the target visibility
 
 ## Setup
 
-### 1. Create a Fine-grained Personal Access Token
+### 1. Create a Fine-grained Personal Access Token (PAT)
 
 Go to **GitHub Settings → Developer settings → Personal access tokens → Fine-grained tokens** and generate a new one:
 
 - **Repository access:** All repositories
 - **Permissions:** `Administration` → Read and write
 - Set an expiration date (don't use "No expiration")
+- Create a PAT (and do not forgot to copy it)
 
 This is the only permission required — repository visibility is an administrative setting, not a content or metadata one.
 
@@ -48,7 +52,7 @@ This is the only permission required — repository visibility is an administrat
 In this repository, go to **Settings → Secrets and variables → Actions → New repository secret**:
 
 - **Name:** `PAT`
-- **Value:** the token you just generated
+- **Value:** paste the copied token you just generated
 
 ### 3. Run the workflow
 
