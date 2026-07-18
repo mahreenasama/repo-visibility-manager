@@ -50,7 +50,7 @@ jobs:
             --json nameWithOwner \
             --jq '.[].nameWithOwner' |
           while read repo; do
-            if [ "$repo" = "${{ github.repository }}" ] || [ "$repo" = "$OWNER/mahreenasama" ]; then
+            if [ "$repo" = "${{ github.repository }}" ]; then
               echo "Skipping $repo"
               continue
             fi
