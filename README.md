@@ -3,6 +3,7 @@
 A GitHub Actions workflow that bulk-changes the visibility of all repositories in your account: 
 - Public → Private
 - Private → Public
+
 with just a single click. No local scripts, no manual clicking through dozens of repo settings pages.
 
 I built this after ending up with 80+ public repos where only a few of them were actually meant to be seen. Flipping each one by hand wasn't worth, so I automated it.
